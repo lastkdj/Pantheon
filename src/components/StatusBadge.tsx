@@ -1,21 +1,24 @@
 import type { ApprovalStatus, TaskStatus } from "@/lib/schema";
 
-const styles: Record<TaskStatus | ApprovalStatus, string> = {
-  todo: "border-gunmetal-grey text-slate-grey",
-  "in-progress": "border-aethelred-gold text-aethelred-gold",
-  review: "border-void-gold-light text-void-gold-light bg-aethelred-gold/10",
-  blocked: "border-destruction text-destruction",
-  done: "border-success text-success",
-  pending: "border-aethelred-gold text-aethelred-gold bg-aethelred-gold/10",
-  approved: "border-success text-success",
-  rejected: "border-destruction text-destruction",
-  deferred: "border-muted-grey text-muted-grey",
+/** One hue per status, used here, in the progress bar and on the board. */
+export const STATUS_STYLE: Record<TaskStatus | ApprovalStatus, { text: string; dot: string; label: string }> = {
+  todo: { text: "text-stone", dot: "bg-stone/70", label: "To do" },
+  "in-progress": { text: "text-lapis", dot: "bg-lapis", label: "In progress" },
+  review: { text: "text-bronze-hi", dot: "bg-bronze", label: "In review" },
+  blocked: { text: "text-oxblood", dot: "bg-oxblood", label: "Blocked" },
+  done: { text: "text-verdigris", dot: "bg-verdigris", label: "Done" },
+  pending: { text: "text-bronze-hi", dot: "bg-bronze", label: "Waiting" },
+  approved: { text: "text-verdigris", dot: "bg-verdigris", label: "Approved" },
+  rejected: { text: "text-oxblood", dot: "bg-oxblood", label: "Rejected" },
+  deferred: { text: "text-ash", dot: "bg-ash", label: "Deferred" },
 };
 
 export function StatusBadge({ status }: { status: TaskStatus | ApprovalStatus }) {
+  const s = STATUS_STYLE[status];
   return (
-    <span className={`inline-block rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wider ${styles[status]}`}>
-      {status}
+    <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${s.text}`}>
+      <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${s.dot}`} />
+      {s.label}
     </span>
   );
 }

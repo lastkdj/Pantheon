@@ -14,6 +14,15 @@ project repo (docs/agents/*.md)  →  GitHub API (read-only token, cached 60 s)
 
 The markdown format is the contract. See [docs/FORMAT.md](docs/FORMAT.md). Projects are listed in [`pantheon.config.json`](pantheon.config.json); adding one is a config entry, not a code change (the `sample` project proves it).
 
+## Pages
+
+- **Overview**: leads with what needs the owner (decisions, work ready to review, blocked tasks), then progress, who is working and spend.
+- **Board**: tasks by status, with search and a role filter.
+- **Task**: where it is on the way to done, what it waits on, its session name, and a brief to paste into a new session.
+- **Approvals**, **Costs**, **Health**: the decision queue, spend per task, and anything the files got wrong.
+
+Pantheon tracks its own work in `docs/agents/` using the same format, so it appears as a project in its own sidebar. Decisions are in `docs/DECISIONS.md`.
+
 ## Run it
 
 ```bash

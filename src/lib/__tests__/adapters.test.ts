@@ -56,7 +56,7 @@ describe("sample project fixtures", () => {
     expect(board.issues).toEqual([]);
     expect(board.value).toHaveLength(5);
     expect(board.value[1].tier).toBe("B");
-    expect(board.value[1].branch).toBeUndefined();
+    expect(board.value[1].branch).toBe("work/W-002-ingest-tide-readings");
   });
   it("reads a per-task usage table", () => {
     const usage = parseUsage(fx("sample/agents/costs.md"));
@@ -66,6 +66,22 @@ describe("sample project fixtures", () => {
   it("finds ready tasks", () => {
     const board = parseBoard(fx("sample/agents/tasks.md"));
     expect(readyTasks(board.value)).toEqual([]);
+  });
+});
+
+describe("Pantheon's own docs", () => {
+  const root = path.join(__dirname, "../../../docs/agents");
+  const board = parseBoard(readFileSync(path.join(root, "board.md"), "utf8"));
+  const approvals = parseApprovals(readFileSync(path.join(root, "approvals.md"), "utf8"));
+
+  it("parse without any issue, so its own dashboard cannot silently break", () => {
+    expect(board.issues).toEqual([]);
+    expect(approvals.issues).toEqual([]);
+    expect(validate(board.value, approvals.value)).toEqual([]);
+  });
+  it("show what is waiting on the owner", () => {
+    expect(approvals.value.filter((a) => a.status === "pending").map((a) => a.id)).toEqual(["A-003", "A-004"]);
+    expect(board.value.find((t) => t.id === "P-005")?.branch).toBe("feat/ui-overhaul");
   });
 });
 
@@ -91,6 +107,10 @@ describe("malformed input", () => {
   it("reports a missing table instead of returning nothing silently", () => {
     const r = parseBoard("# Nothing here");
     expect(r.issues[0].message).toMatch(/No board table found/);
+  });
+  it("does not mistake prose for a branch name", () => {
+    const r = parseBoard(header + "| T-001 | a | x | todo | none | the branch is merged | |");
+    expect(r.value[0].branch).toBeUndefined();
   });
   it("reports a row without a valid ID", () => {
     const r = parseBoard(header + "| nope | a | x | todo | none | | |");

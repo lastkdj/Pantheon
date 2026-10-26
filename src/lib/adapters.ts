@@ -19,6 +19,8 @@ export interface Parsed<T> {
 
 const PR_RE = /https:\/\/github\.com\/[^\s)]+\/pull\/(\d+)/;
 const BRANCH_RE = /\b(agent\/[a-z0-9-]+\/[A-Za-z0-9._-]+)/;
+/** Fallback: "branch feat/some-name" (must contain a slash, so prose like "branch is merged" never matches). */
+const BRANCH_WORD_RE = /\bbranch\s+`?([A-Za-z0-9._-]+\/[A-Za-z0-9._/-]+)`?/;
 const ID_RE = /^[A-Za-z]+-\d+$/;
 
 function findTable(tables: Table[], ...required: string[]): Table | undefined {
@@ -106,7 +108,7 @@ export function parseBoard(text: string, file = "board.md"): Parsed<Task[]> {
       notes: cell(row.cells, idx.notes),
       session: cell(row.cells, idx.session) || undefined,
       tier: cell(row.cells, idx.tier) || undefined,
-      branch: branchMatch?.[1],
+      branch: branchMatch?.[1] ?? output.match(BRANCH_WORD_RE)?.[1],
       pr: prMatch ? { url: prMatch[0], number: Number(prMatch[1]) } : undefined,
     });
   }

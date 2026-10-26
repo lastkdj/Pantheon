@@ -1,23 +1,39 @@
 import { notFound } from "next/navigation";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getLoaded } from "@/lib/cached";
+import { riskLevel } from "@/lib/roles";
 import type { Approval } from "@/lib/schema";
 
-function ApprovalCard({ a }: { a: Approval }) {
+export const metadata = { title: "Approvals" };
+
+const RISK_STYLE = {
+  critical: "text-oxblood",
+  high: "text-oxblood",
+  medium: "text-bronze-hi",
+  low: "text-verdigris",
+} as const;
+
+function ApprovalRow({ a }: { a: Approval }) {
+  const level = riskLevel(a.risk);
   return (
-    <li className={`void-card p-4 ${a.status === "pending" ? "border-l-4 border-l-aethelred-gold" : ""}`}>
-      <div className="flex flex-wrap items-center gap-3">
-        <span className="font-semibold text-aethelred-gold">{a.id}</span>
-        <StatusBadge status={a.status} />
-        <span className="text-xs text-muted-grey">requested by {a.agent || "unknown"}</span>
+    <li className={a.status === "pending" ? "border-l-2 border-l-bronze" : ""}>
+      <div className="px-5 py-4">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span className="font-semibold text-bronze">{a.id}</span>
+          <StatusBadge status={a.status} />
+          {level && <span className={`text-xs font-medium ${RISK_STYLE[level]}`}>{level[0].toUpperCase() + level.slice(1)} risk</span>}
+          <span className="text-xs text-ash sm:ml-auto">Asked by {a.agent || "unknown"}</span>
+        </div>
+        <p className="mt-2 max-w-3xl text-marble">{a.action}</p>
+        {a.statusNote && <p className="mt-1.5 max-w-3xl text-sm text-ash">{a.statusNote}</p>}
+        <details className="mt-3 max-w-3xl text-sm">
+          <summary className="cursor-pointer text-bronze-hi">What is prepared and what could go wrong</summary>
+          <dl className="mt-3 space-y-3">
+            <div><dt className="label">Prepared</dt><dd className="mt-0.5 text-stone">{a.prepared || "Nothing stated"}</dd></div>
+            <div><dt className="label">Risk</dt><dd className="mt-0.5 text-stone">{a.risk || "Nothing stated"}</dd></div>
+          </dl>
+        </details>
       </div>
-      <p className="mt-2 text-sm font-medium text-row-title">{a.action}</p>
-      {a.statusNote && <p className="mt-1 text-xs text-muted-grey">{a.statusNote}</p>}
-      <details className="mt-3 text-sm">
-        <summary className="cursor-pointer text-xs text-void-gold-light">Prepared and risk</summary>
-        <p className="mt-2 text-list-text"><span className="eyebrow mr-2">Prepared</span>{a.prepared || "None"}</p>
-        <p className="mt-2 text-list-text"><span className="eyebrow mr-2">Risk</span>{a.risk || "None stated"}</p>
-      </details>
     </li>
   );
 }
@@ -30,22 +46,27 @@ export default async function ApprovalsPage({ params }: { params: Promise<{ proj
   const decided = loaded.state.approvals.filter((a) => a.status !== "pending");
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12">
       <section aria-labelledby="pending">
-        <h1 id="pending" className="mb-1 text-2xl">Waiting for you</h1>
-        <p className="mb-4 text-sm text-muted-grey">
-          Decisions are made in the project&apos;s approvals file, not here. This page only shows them.
+        <h1 id="pending" className="text-3xl">{pending.length > 0 ? "Waiting for you" : "Approvals"}</h1>
+        <p className="mb-5 mt-2 max-w-xl text-sm text-stone">
+          Decide in the project&apos;s approvals file. This page only shows the state.
         </p>
         {pending.length === 0 ? (
-          <div className="void-card p-5 text-sm">Nothing is waiting for a decision.</div>
+          <div className="panel p-6">
+            <p className="text-marble">Nothing is waiting for a decision.</p>
+            <p className="mt-1 text-sm text-stone">New requests appear here as soon as an agent adds a row marked pending.</p>
+          </div>
         ) : (
-          <ul className="space-y-3">{pending.map((a) => <ApprovalCard key={a.id} a={a} />)}</ul>
+          <ul className="ledger panel">{pending.map((a) => <ApprovalRow key={a.id} a={a} />)}</ul>
         )}
       </section>
-      <section aria-labelledby="decided">
-        <h2 id="decided" className="mb-4 text-xl">Decided</h2>
-        <ul className="space-y-3">{decided.map((a) => <ApprovalCard key={a.id} a={a} />)}</ul>
-      </section>
+      {decided.length > 0 && (
+        <section aria-labelledby="decided">
+          <h2 id="decided" className="mb-4 text-xl">Decided</h2>
+          <ul className="ledger panel">{decided.map((a) => <ApprovalRow key={a.id} a={a} />)}</ul>
+        </section>
+      )}
     </div>
   );
 }

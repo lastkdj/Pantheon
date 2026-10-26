@@ -19,7 +19,7 @@ export function CopyButton({ text, label = "Copy brief" }: { text: string; label
     <button
       type="button"
       onClick={copy}
-      className="rounded-md bg-aethelred-gold px-4 py-2 text-sm font-semibold text-void-black hover:bg-void-gold-light"
+      className="rounded-md bg-bronze px-4 py-2 text-sm font-semibold text-ink hover:bg-bronze-hi"
     >
       {state === "copied" ? "Copied" : state === "failed" ? "Copy failed" : label}
     </button>

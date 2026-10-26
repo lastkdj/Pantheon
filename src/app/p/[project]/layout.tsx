@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Nav } from "@/components/Nav";
+import { SideNav } from "@/components/SideNav";
 import { getLoaded } from "@/lib/cached";
 import { projects } from "@/lib/config";
 
@@ -15,20 +15,28 @@ export default async function ProjectLayout({
   const { project } = await params;
   const loaded = await getLoaded(project);
   if (!loaded) notFound();
-  const errorCount = loaded.state.issues.filter((i) => i.severity === "error").length;
+  const { state } = loaded;
 
   return (
-    <>
-      <Nav projects={projects.map((p) => ({ id: p.id, name: p.name }))} current={project} errorCount={errorCount} />
-      {loaded.warnings.length > 0 && (
-        <div role="status" className="border-b border-aethelred-gold/40 bg-aethelred-gold/10 px-4 py-2 text-center text-sm text-void-gold-light">
-          {loaded.warnings[0]}
-        </div>
-      )}
-      <main className="mx-auto max-w-7xl px-4 py-8">{children}</main>
-      <footer className="mx-auto max-w-7xl px-4 pb-10 text-xs text-muted-grey">
-        {loaded.project.name} · {loaded.origin === "github" ? "live from GitHub" : "snapshot"} · refreshes about every minute · read-only
-      </footer>
-    </>
+    <div className="lg:grid lg:grid-cols-[15.5rem_minmax(0,1fr)]">
+      <SideNav
+        projects={projects.map((p) => ({ id: p.id, name: p.name }))}
+        current={project}
+        origin={loaded.origin}
+        counts={{
+          waiting: state.approvals.filter((a) => a.status === "pending").length,
+          review: state.tasks.filter((t) => t.status === "review").length,
+          errors: state.issues.filter((i) => i.severity === "error").length,
+        }}
+      />
+      <div className="min-w-0">
+        {loaded.warnings.length > 0 && (
+          <div role="status" className="border-b border-bronze/30 bg-bronze/10 px-6 py-2.5 text-sm text-bronze-hi">
+            {loaded.warnings[0]}
+          </div>
+        )}
+        <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:py-10">{children}</main>
+      </div>
+    </div>
   );
 }

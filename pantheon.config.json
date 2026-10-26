@@ -15,6 +15,18 @@
       "rulesPath": "docs/agents/RULES.md"
     },
     {
+      "id": "pantheon",
+      "name": "Pantheon",
+      "source": { "type": "github", "repo": "lastkdj/pantheon", "branch": "main", "fallbackDir": "." },
+      "files": {
+        "board": "docs/agents/board.md",
+        "approvals": "docs/agents/approvals.md",
+        "usage": "docs/agents/token-usage.md"
+      },
+      "sessionName": "{task} · {slug} · {stage}",
+      "branchPattern": "feat/{slug}"
+    },
+    {
       "id": "sample",
       "name": "Sample: Tidewatch",
       "source": { "type": "fixtures", "dir": "fixtures/sample" },

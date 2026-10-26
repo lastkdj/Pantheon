@@ -1,28 +1,32 @@
 import type { Config } from "tailwindcss";
 
-// Void design tokens (copied from MyGold DESIGN_SYSTEM.md, section 2).
+// Pantheon palette: ink (night sky), marble (text), bronze (accent), plus one hue per task status.
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        "void-black": "#050609",
-        "void-navy": "#0A0D15",
-        "gunmetal-grey": "#1A1F2C",
-        "aethelred-gold": "#CBA052",
-        "void-gold-light": "#E9C684",
-        "slate-grey": "#A8B1C2",
-        "muted-grey": "#5C6472",
-        "panel-heading": "#F5EBD3",
-        "row-title": "#F0E4CC",
-        "list-text": "#C9D0DB",
-        destruction: "hsl(0, 84%, 60%)",
-        success: "hsl(142, 71%, 45%)",
+        ink: "#0A0D14",
+        "ink-2": "#10141E",
+        "ink-3": "#171C29",
+        line: "#232A3B",
+        marble: "#ECE6D8",
+        stone: "#A5AEBF",
+        ash: "#7C869B",
+        bronze: "#C9A45C",
+        "bronze-hi": "#E3C37F",
+        lapis: "#7C9AE0",
+        verdigris: "#5EA98B",
+        oxblood: "#D2604F",
       },
       fontFamily: {
         cinzel: ["Cinzel", "serif"],
-        montserrat: ["Montserrat", "system-ui", "sans-serif"],
+        sans: ["Instrument Sans", "system-ui", "sans-serif"],
       },
+      keyframes: {
+        grow: { from: { transform: "scaleX(0)" }, to: { transform: "scaleX(1)" } },
+      },
+      animation: { grow: "grow 700ms cubic-bezier(.2,.7,.2,1) both" },
     },
   },
   plugins: [],
