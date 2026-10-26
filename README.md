@@ -16,7 +16,7 @@ The markdown format is the contract. See [docs/FORMAT.md](docs/FORMAT.md). Proje
 
 ## Pages
 
-- **Overview**: leads with what needs the owner (a carousel of decisions, reviews and blocked work), then a progress ring, a workload chart, and gradient tiles for open tasks and spend.
+- **Overview**: four KPI cards, concentric task-flow rings, workload by agent as stacked bars, a "Needs you" table (decisions, reviews, blocked work), an approvals gauge and an agents table.
 - **Board**: tasks by status. The header search filters it live (and the filter lives in the URL, so it can be shared); chips filter by agent.
 - **Task**: where it is on the way to done, what it waits on, its session name, and a brief to paste into a new session.
 - **Approvals**, **Costs**, **Health**: the decision queue, spend per task, and anything the files got wrong.

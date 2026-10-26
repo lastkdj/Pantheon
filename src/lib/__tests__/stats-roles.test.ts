@@ -40,6 +40,14 @@ describe("overview", () => {
     // frontend and qa both have 2 open (tie broken by name); backend has 1.
     expect(o.workload.map((w) => w.owner)).toEqual(["frontend", "qa", "backend"]);
   });
+  it("breaks each agent's tasks down by status", () => {
+    const fe = o.workload.find((w) => w.owner === "frontend")!;
+    expect(fe.total).toBe(2);
+    expect(fe.byStatus).toEqual({ todo: 0, "in-progress": 0, review: 1, blocked: 1, done: 0 });
+  });
+  it("tallies approvals as pending versus decided", () => {
+    expect(o.approvalTally).toEqual({ pending: 1, decided: 1, total: 2 });
+  });
   it("handles an empty board", () => {
     const e = overview([], [], noUsage);
     expect(e.percentDone).toBe(0);
@@ -75,5 +83,14 @@ describe("roles", () => {
     expect(riskLevel("Critical: live key")).toBe("critical");
     expect(riskLevel("medium. Policy mistakes")).toBe("medium");
     expect(riskLevel("Wrong change could reject")).toBeNull();
+  });
+});
+
+import { STACK } from "../stack";
+import { TASK_STATUSES } from "../schema";
+
+describe("stack", () => {
+  it("lists every task status exactly once, so no segment can go missing from a bar", () => {
+    expect(STACK.map((s) => s.status).sort()).toEqual([...TASK_STATUSES].sort());
   });
 });

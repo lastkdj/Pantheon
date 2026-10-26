@@ -11,7 +11,7 @@ export default function ProjectError({ error, reset }: { error: Error & { digest
       <button
         type="button"
         onClick={reset}
-        className="mt-4 rounded-md bg-violet px-4 py-2 text-sm font-semibold text-night hover:bg-violet-hi"
+        className="btn-primary mt-4"
       >
         Try again
       </button>

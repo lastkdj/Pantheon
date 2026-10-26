@@ -1,63 +1,58 @@
 import type { Config } from "tailwindcss";
 
-// Pantheon palette, sampled from the design reference: deep indigo panels, electric violet,
-// blue and teal tiles, one hot-pink action, on a lavender canvas.
+// Pantheon palette, sampled from the owner's two dashboard references:
+// deep navy surfaces, with neon magenta, electric blue and cyan as the data colours.
 const config: Config = {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        night: "#16122A", // deepest base, chart wells
-        "night-2": "#1F1942", // inset surfaces
-        "night-3": "#25204D", // panels and cards
-        "night-4": "#2F2962", // hovered panels
-        edge: "rgba(255,255,255,0.08)",
-        snow: "#F5F3FF",
-        mist: "#B9B4E6",
-        dusk: "#9C97CF",
-        violet: "#6E53DE",
-        "violet-hi": "#A99DFF",
-        azure: "#2050F6",
-        "azure-hi": "#7C9CFF",
+        night: "#081026", // page
+        "night-2": "#0A1432", // wells, inset rows
+        "night-3": "#0B173A", // panels
+        "night-4": "#10205A", // hovered panels
+        edge: "rgba(120,150,255,0.13)",
+        snow: "#F2F5FF",
+        mist: "#B4BEE0",
+        dusk: "#8592C4",
+        violet: "#8B2CF5",
+        "violet-hi": "#C77DFF",
+        magenta: "#CE3CFD",
+        "magenta-hi": "#E58BFF",
+        azure: "#2D5BFF",
+        "azure-hi": "#7F9DFF",
+        cyan: "#02C3FF",
         teal: "#0A9495",
-        mint: "#2FD6B5",
-        coral: "#FF4081",
-        lavender: "#C1BEFC",
+        mint: "#2DD4A0",
+        coral: "#FF5C7A",
       },
       fontFamily: {
-        display: ["Sora", "system-ui", "sans-serif"],
-        sans: ["Plus Jakarta Sans", "system-ui", "sans-serif"],
+        sans: ["Manrope", "system-ui", "sans-serif"],
+        display: ["Manrope", "system-ui", "sans-serif"],
       },
       boxShadow: {
-        frame: "0 40px 90px -30px rgba(40,24,120,0.55), 0 0 0 1px rgba(255,255,255,0.06)",
-        glow: "0 18px 40px -12px rgba(110,83,222,0.7)",
-        "glow-blue": "0 18px 36px -14px rgba(32,80,246,0.8)",
-        "glow-teal": "0 18px 36px -14px rgba(10,148,149,0.8)",
-        "glow-pink": "0 10px 26px -6px rgba(255,64,129,0.7)",
+        glow: "0 10px 30px -10px rgba(206,60,253,0.55)",
+        "glow-blue": "0 10px 30px -10px rgba(45,91,255,0.7)",
+        "glow-cyan": "0 10px 30px -10px rgba(2,195,255,0.6)",
+        panel: "0 20px 40px -24px rgba(0,0,0,0.6)",
       },
       keyframes: {
-        rise: { from: { opacity: "0", transform: "translateY(14px)" }, to: { opacity: "1", transform: "none" } },
-        pop: { from: { opacity: "0", transform: "scale(0.94)" }, to: { opacity: "1", transform: "none" } },
-        float: { "0%,100%": { transform: "translateY(0)" }, "50%": { transform: "translateY(-5px)" } },
-        blink: { "0%,92%,100%": { transform: "scaleY(1)" }, "96%": { transform: "scaleY(0.1)" } },
+        rise: { from: { opacity: "0", transform: "translateY(12px)" }, to: { opacity: "1", transform: "none" } },
+        fade: { from: { opacity: "0" }, to: { opacity: "1" } },
         grow: { from: { transform: "scaleX(0)" }, to: { transform: "scaleX(1)" } },
         growY: { from: { transform: "scaleY(0)" }, to: { transform: "scaleY(1)" } },
         draw: { from: { strokeDashoffset: "var(--len)" }, to: { strokeDashoffset: "var(--off)" } },
-        pulse: { "0%": { boxShadow: "0 0 0 0 rgba(255,64,129,0.55)" }, "100%": { boxShadow: "0 0 0 10px rgba(255,64,129,0)" } },
-        drift: { "0%,100%": { transform: "translate(0,0)" }, "50%": { transform: "translate(24px,-18px)" } },
-        shimmer: { from: { backgroundPosition: "200% 0" }, to: { backgroundPosition: "-200% 0" } },
+        ping: { "0%": { boxShadow: "0 0 0 0 rgba(45,212,160,0.6)" }, "100%": { boxShadow: "0 0 0 8px rgba(45,212,160,0)" } },
+        sweep: { from: { transform: "translateX(-100%)" }, to: { transform: "translateX(100%)" } },
       },
       animation: {
         rise: "rise 600ms cubic-bezier(.2,.7,.2,1) both",
-        pop: "pop 450ms cubic-bezier(.2,.8,.2,1) both",
-        float: "float 3.6s ease-in-out infinite",
-        blink: "blink 5s infinite",
+        fade: "fade 500ms ease-out both",
         grow: "grow 900ms cubic-bezier(.2,.7,.2,1) both",
-        growY: "growY 900ms cubic-bezier(.2,.7,.2,1) both",
-        draw: "draw 1400ms cubic-bezier(.3,.7,.2,1) both",
-        pulse: "pulse 1.8s ease-out infinite",
-        drift: "drift 14s ease-in-out infinite",
-        shimmer: "shimmer 2.4s linear infinite",
+        growY: "growY 1000ms cubic-bezier(.2,.7,.2,1) both",
+        draw: "draw 1500ms cubic-bezier(.3,.7,.2,1) both",
+        ping: "ping 2s ease-out infinite",
+        sweep: "sweep 2.2s ease-in-out infinite",
       },
     },
   },

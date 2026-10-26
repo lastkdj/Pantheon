@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/CopyButton";
-import { Mascot } from "@/components/Mascot";
+import { Avatar } from "@/components/Avatar";
 import { Stepper } from "@/components/Stepper";
 import { buildBrief } from "@/lib/brief";
 import { getLoaded } from "@/lib/cached";
@@ -38,9 +38,9 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
       <div>
         <Link href={`/p/${project}/board`} className="text-sm text-violet-hi underline-offset-4 hover:underline">Back to the board</Link>
         <div className="mt-4 flex items-center gap-5">
-          <Mascot role={task.owner} size={84} />
+          <Avatar role={task.owner} size={64} />
           <div>
-            <h1 className="font-display text-3xl font-semibold leading-none">{task.id}</h1>
+            <h1 className="text-3xl font-semibold leading-none">{task.id}</h1>
             <p className="mt-1 text-sm text-dusk">{task.owner}{task.tier ? `, tier ${task.tier}` : ""}</p>
           </div>
         </div>

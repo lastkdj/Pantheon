@@ -7,6 +7,14 @@ export interface Workload {
   open: number;
   inProgress: number;
   done: number;
+  total: number;
+  byStatus: Record<TaskStatus, number>;
+}
+
+export interface ApprovalTally {
+  pending: number;
+  decided: number;
+  total: number;
 }
 
 export interface Spend {
@@ -25,6 +33,7 @@ export interface Overview {
   ready: Task[];
   workload: Workload[];
   spend: Spend | null;
+  approvalTally: ApprovalTally;
 }
 
 export function overview(tasks: Task[], approvals: Approval[], usage: Usage): Overview {
@@ -33,7 +42,18 @@ export function overview(tasks: Task[], approvals: Approval[], usage: Usage): Ov
 
   const owners = new Map<string, Workload>();
   for (const t of tasks) {
-    const w = owners.get(t.owner) ?? { owner: t.owner, open: 0, inProgress: 0, done: 0 };
+    const w =
+      owners.get(t.owner) ??
+      {
+        owner: t.owner,
+        open: 0,
+        inProgress: 0,
+        done: 0,
+        total: 0,
+        byStatus: Object.fromEntries(TASK_STATUSES.map((st) => [st, 0])) as Record<TaskStatus, number>,
+      };
+    w.total++;
+    w.byStatus[t.status]++;
     if (t.status === "done") w.done++;
     else w.open++;
     if (t.status === "in-progress") w.inProgress++;
@@ -59,5 +79,10 @@ export function overview(tasks: Task[], approvals: Approval[], usage: Usage): Ov
     ready: readyTasks(tasks, approvals),
     workload: [...owners.values()].sort((a, b) => b.open - a.open || a.owner.localeCompare(b.owner)),
     spend,
+    approvalTally: {
+      pending: approvals.filter((a) => a.status === "pending").length,
+      decided: approvals.filter((a) => a.status !== "pending").length,
+      total: approvals.length,
+    },
   };
 }

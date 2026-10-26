@@ -12,3 +12,8 @@ export const IconChevron = () => (<svg {...base} width={16} height={16}><path d=
 export const IconArrowRight = () => (<svg {...base} width={18} height={18}><path d="M5 12h14M13 6l6 6-6 6" /></svg>);
 export const IconArrowLeft = () => (<svg {...base} width={18} height={18}><path d="M19 12H5M11 6l-6 6 6 6" /></svg>);
 export const IconFilter = () => (<svg {...base} width={16} height={16}><path d="M4 6h16M7 12h10M10 18h4" /></svg>);
+export const IconTasks = () => (<svg {...base}><path d="M9 6h11M9 12h11M9 18h11" /><path d="m3.5 6 1.3 1.3L7 5M3.5 12l1.3 1.3L7 11M3.5 18l1.3 1.3L7 17" /></svg>);
+export const IconEye = () => (<svg {...base}><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z" /><circle cx="12" cy="12" r="2.8" /></svg>);
+export const IconDollar = () => (<svg {...base}><path d="M12 3v18M16.5 7.5c-.8-1.2-2.3-2-4.5-2-2.6 0-4 1.2-4 2.9 0 4.2 9 2 9 6.4 0 1.9-1.8 3.2-4.5 3.2-2.4 0-4-.9-4.8-2.4" /></svg>);
+export const IconArrowUpRight = () => (<svg {...base} width={14} height={14}><path d="M7 17 17 7M8 7h9v9" /></svg>);
+export const IconClose = () => (<svg {...base} width={16} height={16}><path d="m6 6 12 12M18 6 6 18" /></svg>);

@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { Mascot } from "@/components/Mascot";
+import { Avatar } from "@/components/Avatar";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getLoaded } from "@/lib/cached";
 import { riskLevel } from "@/lib/roles";
@@ -19,7 +19,7 @@ function ApprovalRow({ a }: { a: Approval }) {
   return (
     <li className={a.status === "pending" ? "border-l-2 border-l-violet" : ""}>
       <div className="flex gap-4 px-5 py-4">
-        <Mascot role={a.agent || "unknown"} size={40} animate={false} />
+        <Avatar role={a.agent || "unknown"} size={40} />
         <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <span className="font-semibold text-violet">{a.id}</span>

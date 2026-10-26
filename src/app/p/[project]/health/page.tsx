@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Mascot } from "@/components/Mascot";
+import { Avatar } from "@/components/Avatar";
 import { getLoaded } from "@/lib/cached";
 import { readyTasks } from "@/lib/validate";
 
@@ -54,9 +54,9 @@ export default async function HealthPage({ params }: { params: Promise<{ project
             {ready.map((t) => (
               <li key={t.id}>
                 <Link href={`/p/${project}/tasks/${t.id}`} className="flex items-start gap-3 px-4 py-3.5 hover:bg-night-3">
-                  <Mascot role={t.owner} size={28} animate={false} />
-                  <span className="font-semibold text-violet">{t.id}</span>
-                  <span className="text-sm text-snow">{t.title.length > 150 ? `${t.title.slice(0, 150)}…` : t.title}</span>
+                  <Avatar role={t.owner} size={28} />
+                  <span className="whitespace-nowrap font-bold text-violet-hi">{t.id}</span>
+                  <span className="min-w-0 flex-1 break-words text-sm text-mist">{t.title.length > 150 ? `${t.title.slice(0, 150)}…` : t.title}</span>
                 </Link>
               </li>
             ))}
