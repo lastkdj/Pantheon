@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-import { RoleSeal } from "./RoleSeal";
+import { Mascot } from "./Mascot";
 import { STATUS_STYLE } from "./StatusBadge";
 import { TASK_STATUSES, type TaskStatus } from "@/lib/schema";
 
@@ -19,7 +20,7 @@ export interface BoardCard {
 }
 
 export function BoardView({ project, cards }: { project: string; cards: BoardCard[] }) {
-  const [query, setQuery] = useState("");
+  const query = useSearchParams().get("q") ?? "";
   const [role, setRole] = useState<string | null>(null);
 
   const roles = useMemo(() => [...new Set(cards.map((c) => c.owner))].sort(), [cards]);
@@ -36,29 +37,18 @@ export function BoardView({ project, cards }: { project: string; cards: BoardCar
   return (
     <div>
       <div className="mb-6 space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <label className="block w-full max-w-xs">
-            <span className="sr-only">Search tasks</span>
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search tasks"
-              className="w-full rounded-md border border-line bg-ink-2 px-3 py-2 text-sm text-marble placeholder:text-ash focus:border-bronze focus:outline-none"
-            />
-          </label>
-          <p className="shrink-0 text-xs text-ash" aria-live="polite">
-            {filtering ? `${visible.length} of ${cards.length} tasks` : `${cards.length} tasks`}
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-1.5" role="group" aria-label="Filter by role">
+        <p className="text-xs text-dusk" aria-live="polite">
+          {filtering ? `${visible.length} of ${cards.length} tasks` : `${cards.length} tasks`}
+          {query.trim() !== "" && <span> matching &ldquo;{query.trim()}&rdquo;</span>}
+        </p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filter by agent">
           <button
             type="button"
             onClick={() => setRole(null)}
             aria-pressed={role === null}
-            className={`rounded-full border px-3 py-1 text-xs font-medium ${role === null ? "border-bronze bg-bronze/15 text-bronze-hi" : "border-line text-stone hover:text-marble"}`}
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold transition duration-300 ${role === null ? "bg-violet text-white shadow-glow" : "bg-night-3 text-mist hover:bg-night-4"}`}
           >
-            All roles
+            All agents
           </button>
           {roles.map((r) => (
             <button
@@ -66,9 +56,9 @@ export function BoardView({ project, cards }: { project: string; cards: BoardCar
               type="button"
               onClick={() => setRole(role === r ? null : r)}
               aria-pressed={role === r}
-              className={`flex items-center gap-1.5 rounded-full border py-0.5 pl-0.5 pr-3 text-xs font-medium ${role === r ? "border-bronze bg-bronze/15 text-bronze-hi" : "border-line text-stone hover:text-marble"}`}
+              className={`flex items-center gap-1.5 rounded-full py-1 pl-1.5 pr-3.5 text-xs font-semibold transition duration-300 ${role === r ? "bg-violet text-white shadow-glow" : "bg-night-3 text-mist hover:bg-night-4"}`}
             >
-              <RoleSeal role={r} size={22} />
+              <span className="-my-2 -ml-0.5 h-6 w-6 overflow-hidden"><Mascot role={r} size={22} animate={false} /></span>
               {r}
             </button>
           ))}
@@ -76,40 +66,41 @@ export function BoardView({ project, cards }: { project: string; cards: BoardCar
       </div>
 
       {visible.length === 0 ? (
-        <div className="panel p-8 text-center">
-          <p className="text-marble">No tasks match.</p>
-          <p className="mt-1 text-sm text-ash">Clear the search or pick another role to see the whole board.</p>
+        <div className="panel pop p-10 text-center">
+          <div className="mx-auto w-fit"><Mascot role="empty" size={76} /></div>
+          <p className="mt-3 font-display text-lg font-semibold text-snow">No tasks match</p>
+          <p className="mt-1 text-sm text-dusk">Clear the search box above, or pick another agent, to see the whole board.</p>
           <button
             type="button"
-            onClick={() => { setQuery(""); setRole(null); }}
-            className="mt-4 rounded-md bg-bronze px-4 py-2 text-sm font-semibold text-ink hover:bg-bronze-hi"
+            onClick={() => setRole(null)}
+            className="mt-5 rounded-full bg-violet px-5 py-2 text-sm font-semibold text-white shadow-glow transition hover:scale-105 active:scale-95"
           >
-            Clear filters
+            Show all agents
           </button>
         </div>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-5">
-          {TASK_STATUSES.map((status) => {
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+          {TASK_STATUSES.map((status, col) => {
             const column = visible.filter((c) => c.status === status);
             const list = (
-              <ul className="space-y-2">
-                {column.map((c) => (
-                  <li key={c.id}>
+              <ul className="space-y-3">
+                {column.map((c, i) => (
+                  <li key={c.id} className="rise" style={{ ["--i" as string]: Math.min(i + col, 9) }}>
                     <Link
                       href={`/p/${project}/tasks/${c.id}`}
-                      className="group block rounded-lg border border-line bg-ink-2 p-3 hover:border-bronze/60 hover:bg-ink-3"
+                      className="lift group block rounded-2xl bg-night-3 p-3.5 ring-1 ring-edge transition-shadow hover:shadow-glow hover:ring-violet/60"
                     >
-                      <div className="flex items-center gap-2">
-                        <RoleSeal role={c.owner} size={24} />
-                        <span className="text-sm font-semibold text-bronze">{c.id}</span>
-                        {c.tier && <span className="ml-auto text-xs text-ash">Tier {c.tier}</span>}
+                      <div className="flex items-center gap-2.5">
+                        <Mascot role={c.owner} size={30} animate={false} />
+                        <span className="font-display text-sm font-semibold text-snow">{c.id}</span>
+                        {c.tier && <span className="ml-auto rounded-full bg-night-2 px-2 py-0.5 text-[11px] text-dusk">Tier {c.tier}</span>}
                       </div>
-                      <p className="mt-2 line-clamp-3 text-sm leading-snug text-marble">{c.title}</p>
+                      <p className="mt-2.5 line-clamp-3 text-[13px] leading-snug text-mist transition-colors group-hover:text-snow">{c.title}</p>
                       {(c.prNumber || c.waitingOn.length > 0) && (
-                        <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-                          {c.prNumber && <span className="text-bronze-hi">PR {c.prNumber}</span>}
+                        <div className="mt-2.5 flex flex-wrap gap-1.5 text-[11px]">
+                          {c.prNumber && <span className="rounded-full bg-azure/25 px-2 py-0.5 font-semibold text-azure-hi">PR {c.prNumber}</span>}
                           {c.waitingOn.length > 0 && (
-                            <span className="text-ash" title={c.waitingOn.join(", ")}>
+                            <span className="rounded-full bg-night-2 px-2 py-0.5 text-dusk" title={c.waitingOn.join(", ")}>
                               Waits on {c.waitingOn.slice(0, 2).join(", ")}{c.waitingOn.length > 2 ? ` +${c.waitingOn.length - 2}` : ""}
                             </span>
                           )}
@@ -118,19 +109,19 @@ export function BoardView({ project, cards }: { project: string; cards: BoardCar
                     </Link>
                   </li>
                 ))}
-                {column.length === 0 && <li className="px-1 text-xs text-ash">Nothing here.</li>}
+                {column.length === 0 && <li className="px-1 py-2 text-xs text-dusk">Nothing here.</li>}
               </ul>
             );
             return (
-              <section key={status} aria-labelledby={`col-${status}`} className="min-w-0">
-                <h2 id={`col-${status}`} className="mb-3 flex items-center gap-2 font-sans text-sm font-semibold text-marble">
-                  <span aria-hidden="true" className={`h-2 w-2 rounded-full ${STATUS_STYLE[status].dot}`} />
+              <section key={status} aria-labelledby={`col-${status}`} className="min-w-0 rounded-[26px] bg-night-2/60 p-3">
+                <h3 id={`col-${status}`} className="mb-3 flex items-center gap-2 px-1 font-sans text-sm font-semibold text-snow">
+                  <span aria-hidden="true" className={`h-2.5 w-2.5 rounded-full ${STATUS_STYLE[status].dot}`} />
                   {STATUS_STYLE[status].label}
-                  <span className="font-normal text-ash">{column.length}</span>
-                </h2>
+                  <span className="ml-auto rounded-full bg-night-3 px-2 py-0.5 text-xs font-medium text-mist">{column.length}</span>
+                </h3>
                 {status === "done" ? (
                   <details open={filtering}>
-                    <summary className="mb-2 cursor-pointer text-xs text-bronze-hi">
+                    <summary className="mb-3 cursor-pointer rounded-full bg-night-3 px-3 py-1.5 text-center text-xs font-medium text-violet-hi transition hover:bg-night-4">
                       {column.length} finished, show
                     </summary>
                     {list}

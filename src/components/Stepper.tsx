@@ -11,8 +11,8 @@ const STEPS: { status: TaskStatus; label: string }[] = [
 export function Stepper({ status }: { status: TaskStatus }) {
   if (status === "blocked") {
     return (
-      <p className="flex items-center gap-2 text-sm font-medium text-oxblood" role="status">
-        <span aria-hidden="true" className="h-2 w-2 rounded-full bg-oxblood" />
+      <p className="flex items-center gap-2 text-sm font-medium text-coral" role="status">
+        <span aria-hidden="true" className="h-2 w-2 rounded-full bg-coral" />
         Blocked. See the notes below for what it is waiting on.
       </p>
     );
@@ -28,15 +28,15 @@ export function Stepper({ status }: { status: TaskStatus }) {
               <span
                 aria-hidden="true"
                 className={`h-3 w-3 rounded-full border-2 ${
-                  reached ? "border-bronze bg-bronze" : "border-line bg-ink"
-                } ${i === current ? "ring-4 ring-bronze/20" : ""}`}
+                  reached ? "border-violet bg-violet" : "border-edge bg-night"
+                } ${i === current ? "ring-4 ring-violet/20" : ""}`}
               />
-              <span className={`text-sm ${i === current ? "font-semibold text-marble" : reached ? "text-stone" : "text-ash"}`}>
+              <span className={`text-sm ${i === current ? "font-semibold text-snow" : reached ? "text-mist" : "text-dusk"}`}>
                 {s.label}
               </span>
             </span>
             {i < STEPS.length - 1 && (
-              <span aria-hidden="true" className={`mx-3 h-px flex-1 ${i < current ? "bg-bronze" : "bg-line"}`} />
+              <span aria-hidden="true" className={`mx-3 h-px flex-1 ${i < current ? "bg-violet" : "bg-edge"}`} />
             )}
           </li>
         );

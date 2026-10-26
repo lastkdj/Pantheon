@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { RoleSeal } from "@/components/RoleSeal";
-import { StatusBar } from "@/components/StatusBar";
+import { Donut } from "@/components/Donut";
+import { Mascot } from "@/components/Mascot";
+import { NeedsCarousel, type NeedItem } from "@/components/NeedsCarousel";
+import { StatTile } from "@/components/StatTile";
+import { WorkloadChart } from "@/components/WorkloadChart";
 import { getLoaded } from "@/lib/cached";
 import { riskLevel } from "@/lib/roles";
 import { overview } from "@/lib/stats";
@@ -11,16 +14,14 @@ export const metadata = { title: "Overview" };
 const plural = (n: number, one: string, many = `${one}s`) => `${n} ${n === 1 ? one : many}`;
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n).trimEnd()}…` : s);
 
-const RISK_TEXT = { critical: "text-oxblood", high: "text-oxblood", medium: "text-bronze-hi", low: "text-verdigris" } as const;
-
 export default async function OverviewPage({ params }: { params: Promise<{ project: string }> }) {
   const { project } = await params;
   const loaded = await getLoaded(project);
   if (!loaded) notFound();
   const { tasks, approvals, usage } = loaded.state;
   const o = overview(tasks, approvals, usage);
-
   const waiting = o.pendingApprovals.length;
+
   const headline =
     waiting > 0
       ? `${plural(waiting, "decision")} waiting for you`
@@ -29,139 +30,122 @@ export default async function OverviewPage({ params }: { params: Promise<{ proje
         : o.blocked.length > 0
           ? `${plural(o.blocked.length, "task")} blocked`
           : "Nothing needs you right now";
-  const quiet = waiting === 0 && o.inReview.length === 0 && o.blocked.length === 0;
+
+  const needs: NeedItem[] = [
+    ...o.pendingApprovals.map((a): NeedItem => {
+      const level = riskLevel(a.risk);
+      return {
+        key: a.id, kind: "decision", id: a.id, title: clip(a.action, 90), role: a.agent || "unknown",
+        meta: level ? `${level[0].toUpperCase()}${level.slice(1)} risk` : "Needs a decision",
+        href: `/p/${project}/approvals`,
+      };
+    }),
+    ...o.inReview.map((t): NeedItem => ({
+      key: t.id, kind: "review", id: t.id, title: clip(t.title, 90), role: t.owner,
+      meta: t.pr ? `PR ${t.pr.number}` : "In review", href: `/p/${project}/tasks/${t.id}`,
+    })),
+    ...o.blocked.map((t): NeedItem => ({
+      key: t.id, kind: "blocked", id: t.id, title: clip(t.title, 90), role: t.owner,
+      meta: "Blocked", href: `/p/${project}/tasks/${t.id}`,
+    })),
+  ].slice(0, 14);
+
+  const inFlight = o.byStatus["in-progress"] + o.byStatus.review;
+  const legend = [
+    { label: "Done", value: o.byStatus.done, dot: "bg-mint" },
+    { label: "In flight", value: inFlight, dot: "bg-violet-hi" },
+    { label: "To do", value: o.byStatus.todo, dot: "bg-dusk" },
+    { label: "Blocked", value: o.byStatus.blocked, dot: "bg-coral" },
+  ];
 
   return (
-    <div className="grid gap-10 xl:grid-cols-[minmax(0,1fr)_20rem]">
-      <div className="min-w-0 space-y-10">
-        <header>
-          <p className="text-sm text-ash">{loaded.project.name}</p>
-          <h1 className="mt-1 text-3xl leading-tight sm:text-4xl">{headline}</h1>
-          {!quiet && (
-            <p className="mt-3 max-w-xl text-stone">
-              Decisions come first, then work ready for your review, then anything stuck.
-            </p>
-          )}
-        </header>
-
-        {quiet && (
-          <div className="panel p-6">
-            <p className="text-marble">All quiet.</p>
-            <p className="mt-1 text-sm text-stone">
-              {o.ready.length > 0 ? (
-                <>
-                  {plural(o.ready.length, "task")} can start now.{" "}
-                  <Link className="text-bronze-hi underline-offset-4 hover:underline" href={`/p/${project}/health`}>See what is ready</Link>
-                </>
-              ) : (
-                "Every open task is waiting on something else."
-              )}
-            </p>
-          </div>
-        )}
-
-        {waiting > 0 && (
-          <section aria-labelledby="decisions">
-            <h2 id="decisions" className="mb-3 text-xl">Decisions</h2>
-            <ul className="ledger panel">
-              {o.pendingApprovals.map((a) => {
-                const level = riskLevel(a.risk);
-                return (
-                  <li key={a.id}>
-                    <Link href={`/p/${project}/approvals`} className="block px-4 py-4 hover:bg-ink-3">
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-sm font-semibold text-bronze">{a.id}</span>
-                        {level && <span className={`text-xs font-medium ${RISK_TEXT[level]}`}>{level[0].toUpperCase() + level.slice(1)} risk</span>}
-                      </div>
-                      <p className="mt-1 text-marble">{clip(a.action, 180)}</p>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </section>
-        )}
-
-        {o.inReview.length > 0 && (
-          <section aria-labelledby="review">
-            <h2 id="review" className="mb-3 text-xl">Ready to review</h2>
-            <ul className="ledger panel">
-              {o.inReview.map((t) => (
-                <li key={t.id}>
-                  <Link href={`/p/${project}/tasks/${t.id}`} className="flex items-start gap-3 px-4 py-4 hover:bg-ink-3">
-                    <RoleSeal role={t.owner} />
-                    <div className="min-w-0">
-                      <div className="flex items-baseline gap-3">
-                        <span className="text-sm font-semibold text-bronze">{t.id}</span>
-                        {t.pr && <span className="text-xs text-bronze-hi">PR {t.pr.number}</span>}
-                      </div>
-                      <p className="mt-0.5 text-marble">{clip(t.title, 160)}</p>
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
-
-        {o.blocked.length > 0 && (
-          <section aria-labelledby="blocked">
-            <h2 id="blocked" className="mb-3 text-xl">Blocked</h2>
-            <ul className="ledger panel">
-              {o.blocked.map((t) => (
-                <li key={t.id}>
-                  <Link href={`/p/${project}/tasks/${t.id}`} className="flex items-start gap-3 px-4 py-4 hover:bg-ink-3">
-                    <RoleSeal role={t.owner} />
-                    <div className="min-w-0">
-                      <span className="text-sm font-semibold text-bronze">{t.id}</span>
-                      <p className="mt-0.5 text-marble">{clip(t.title, 140)}</p>
-                      {t.notes && <p className="mt-1 text-sm text-ash">{clip(t.notes, 140)}</p>}
-                    </div>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
-        )}
+    <div className="space-y-6">
+      <div className="rise">
+        <p className="text-sm text-dusk">{loaded.project.name}</p>
+        <h1 className="mt-1 font-display text-2xl font-semibold leading-tight sm:text-3xl">{headline}</h1>
       </div>
 
-      <aside className="min-w-0 space-y-8 xl:border-l xl:border-line xl:pl-8" aria-label="Project summary">
-        <section aria-labelledby="progress">
-          <h2 id="progress" className="mb-3 text-lg">Progress</h2>
-          <p className="mb-3 text-sm text-stone">
-            <span className="text-2xl font-semibold text-marble">{o.percentDone}%</span> of {plural(o.total, "task")} done
-          </p>
-          <StatusBar counts={o.byStatus} total={o.total} />
+      <div className="grid gap-6 xl:grid-cols-12">
+        <section aria-labelledby="progress" className="panel rise flex flex-col p-6 xl:col-span-4" style={{ ["--i" as string]: 1 }}>
+          <h3 id="progress" className="mb-5 font-display text-lg font-semibold text-snow">Progress</h3>
+          <div className="my-auto flex flex-wrap items-center gap-6">
+            <Donut percent={o.percentDone} />
+            <ul className="min-w-0 flex-1 space-y-3 text-sm">
+              {legend.map((l) => (
+                <li key={l.label} className="flex items-center gap-2.5">
+                  <span className={`h-2.5 w-2.5 shrink-0 rounded-full ${l.dot}`} />
+                  <span className="min-w-0 flex-1 truncate text-mist">{l.label}</span>
+                  <span className="font-semibold text-snow">{l.value}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </section>
 
-        <section aria-labelledby="who">
-          <h2 id="who" className="mb-3 text-lg">Who is working</h2>
-          <ul className="space-y-3">
-            {o.workload.map((w) => (
-              <li key={w.owner} className="flex items-center gap-3">
-                <RoleSeal role={w.owner} size={30} />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm text-marble">{w.owner}</p>
-                  <p className="text-xs text-ash">
-                    {w.open} open{w.inProgress > 0 ? `, ${w.inProgress} in progress` : ""}, {w.done} done
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+        <section aria-label="What needs you" className="min-w-0 xl:col-span-8">
+          {needs.length > 0 ? (
+            <NeedsCarousel items={needs} />
+          ) : (
+            <div className="panel flex items-center gap-6 p-6">
+              <Mascot role="pantheon" size={84} />
+              <div>
+                <h3 className="font-display text-lg font-semibold text-snow">All quiet</h3>
+                <p className="mt-1 text-sm text-mist">
+                  {o.ready.length > 0 ? (
+                    <>
+                      {plural(o.ready.length, "task")} can start now.{" "}
+                      <Link className="text-violet-hi underline-offset-4 hover:underline" href={`/p/${project}/health`}>See what is ready</Link>
+                    </>
+                  ) : (
+                    "Every open task is waiting on something else."
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
+        </section>
+      </div>
+
+      <div className="grid gap-6 xl:grid-cols-12">
+        <section aria-label="Workload" className="panel rise min-w-0 p-6 xl:col-span-8" style={{ ["--i" as string]: 3 }}>
+          <WorkloadChart items={o.workload} />
         </section>
 
-        {o.spend && (
-          <section aria-labelledby="spend">
-            <h2 id="spend" className="mb-3 text-lg">Spend</h2>
-            <p className="text-2xl font-semibold text-marble">${o.spend.usd.toFixed(2)}</p>
-            <p className="mt-1 text-xs text-ash">From the {o.spend.basis} in the usage file.</p>
-            <Link href={`/p/${project}/costs`} className="mt-2 inline-block text-sm text-bronze-hi underline-offset-4 hover:underline">
-              See the breakdown
-            </Link>
+        <div className="space-y-4 xl:col-span-4">
+          <div className="grid grid-cols-2 gap-4">
+            <StatTile tone="blue" value={o.total - o.byStatus.done} label="Open tasks" hint={`${o.ready.length} ready to start`} index={0} />
+            {o.spend ? (
+              <StatTile tone="teal" value={o.spend.usd} decimals={2} prefix="$" label="Spend" hint={`From the ${o.spend.basis}`} index={1} />
+            ) : (
+              <StatTile tone="teal" value={o.byStatus.done} label="Tasks done" hint={`${o.percentDone}% of ${o.total}`} index={1} />
+            )}
+          </div>
+
+          <section aria-labelledby="ready" className="panel rise p-5" style={{ ["--i" as string]: 5 }}>
+            <div className="mb-3 flex items-baseline justify-between">
+              <h3 id="ready" className="font-display text-base font-semibold text-snow">Ready to start</h3>
+              <Link href={`/p/${project}/health`} className="text-xs text-violet-hi hover:underline">All</Link>
+            </div>
+            {o.ready.length === 0 ? (
+              <p className="text-sm text-dusk">Every open task is waiting on something else.</p>
+            ) : (
+              <ul className="space-y-1">
+                {o.ready.slice(0, 4).map((t) => (
+                  <li key={t.id}>
+                    <Link href={`/p/${project}/tasks/${t.id}`} className="flex items-center gap-3 rounded-2xl p-2 transition hover:bg-night-4">
+                      <Mascot role={t.owner} size={30} animate={false} />
+                      <span className="min-w-0">
+                        <span className="block text-sm font-semibold text-snow">{t.id}</span>
+                        <span className="block truncate text-xs text-dusk">{t.title}</span>
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
-        )}
-      </aside>
+        </div>
+      </div>
     </div>
   );
 }

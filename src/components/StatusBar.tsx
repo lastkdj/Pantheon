@@ -7,7 +7,7 @@ export function StatusBar({ counts, total }: { counts: Record<TaskStatus, number
   return (
     <div>
       <div
-        className="flex h-2.5 w-full overflow-hidden rounded-full bg-ink-3"
+        className="flex h-2.5 w-full overflow-hidden rounded-full bg-night-3"
         role="img"
         aria-label={TASK_STATUSES.map((s) => `${counts[s]} ${STATUS_STYLE[s].label.toLowerCase()}`).join(", ")}
       >
@@ -23,8 +23,8 @@ export function StatusBar({ counts, total }: { counts: Record<TaskStatus, number
         {TASK_STATUSES.map((s) => (
           <li key={s} className="flex items-center gap-1.5">
             <span aria-hidden="true" className={`h-1.5 w-1.5 rounded-full ${STATUS_STYLE[s].dot}`} />
-            <span className="text-stone">{STATUS_STYLE[s].label}</span>
-            <span className="font-medium text-marble">{counts[s]}</span>
+            <span className="text-mist">{STATUS_STYLE[s].label}</span>
+            <span className="font-medium text-snow">{counts[s]}</span>
           </li>
         ))}
       </ul>

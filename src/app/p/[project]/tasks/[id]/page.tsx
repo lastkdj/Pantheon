@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/CopyButton";
-import { RoleSeal } from "@/components/RoleSeal";
+import { Mascot } from "@/components/Mascot";
 import { Stepper } from "@/components/Stepper";
 import { buildBrief } from "@/lib/brief";
 import { getLoaded } from "@/lib/cached";
@@ -17,7 +17,7 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
   return (
     <div className="grid gap-1 py-3.5 sm:grid-cols-[9rem_1fr]">
       <dt className="label pt-0.5">{label}</dt>
-      <dd className="min-w-0 break-words text-sm text-marble">{children}</dd>
+      <dd className="min-w-0 break-words text-sm text-snow">{children}</dd>
     </div>
   );
 }
@@ -36,15 +36,15 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
   return (
     <div className="space-y-8">
       <div>
-        <Link href={`/p/${project}/board`} className="text-sm text-bronze-hi underline-offset-4 hover:underline">Back to the board</Link>
-        <div className="mt-4 flex items-center gap-3">
-          <RoleSeal role={task.owner} size={40} />
+        <Link href={`/p/${project}/board`} className="text-sm text-violet-hi underline-offset-4 hover:underline">Back to the board</Link>
+        <div className="mt-4 flex items-center gap-5">
+          <Mascot role={task.owner} size={84} />
           <div>
-            <h1 className="text-3xl leading-none">{task.id}</h1>
-            <p className="mt-1 text-sm text-ash">{task.owner}{task.tier ? `, tier ${task.tier}` : ""}</p>
+            <h1 className="font-display text-3xl font-semibold leading-none">{task.id}</h1>
+            <p className="mt-1 text-sm text-dusk">{task.owner}{task.tier ? `, tier ${task.tier}` : ""}</p>
           </div>
         </div>
-        <p className="mt-5 max-w-3xl text-lg leading-snug text-marble">{task.title}</p>
+        <p className="mt-5 max-w-3xl text-lg leading-snug text-snow">{task.title}</p>
       </div>
 
       <div className="panel px-5 py-5">
@@ -52,17 +52,17 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
       </div>
 
       {issues.length > 0 && (
-        <ul className="panel space-y-1 border-oxblood/50 p-4 text-sm text-oxblood" role="alert">
+        <ul className="panel space-y-1 border-coral/50 p-4 text-sm text-coral" role="alert">
           {issues.map((i, n) => <li key={n}>{i.message}</li>)}
         </ul>
       )}
 
-      <dl className="panel divide-y divide-line px-5">
-        <Row label="Session name"><code className="rounded bg-ink-3 px-1.5 py-0.5 text-bronze-hi">{sessionName(loaded.project, task)}</code></Row>
-        <Row label="Branch"><code className="text-stone">{branchName(loaded.project, task)}</code></Row>
+      <dl className="panel divide-y divide-edge px-5">
+        <Row label="Session name"><code className="rounded bg-night-3 px-1.5 py-0.5 text-violet-hi">{sessionName(loaded.project, task)}</code></Row>
+        <Row label="Branch"><code className="text-mist">{branchName(loaded.project, task)}</code></Row>
         {task.pr && (
           <Row label="Pull request">
-            <a className="text-bronze-hi underline-offset-4 hover:underline" href={task.pr.url} target="_blank" rel="noopener noreferrer">
+            <a className="text-violet-hi underline-offset-4 hover:underline" href={task.pr.url} target="_blank" rel="noopener noreferrer">
               Open PR {task.pr.number} on GitHub
             </a>
           </Row>
@@ -76,12 +76,12 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
                 return (
                   <li key={d} className="flex items-center gap-3">
                     <Link
-                      className="font-medium text-bronze-hi underline-offset-4 hover:underline"
+                      className="font-medium text-violet-hi underline-offset-4 hover:underline"
                       href={isTask ? `/p/${project}/tasks/${d}` : `/p/${project}/approvals`}
                     >
                       {d}
                     </Link>
-                    <span className={met ? "text-verdigris" : "text-ash"}>{met ? "Done" : "Not yet"}</span>
+                    <span className={met ? "text-mint" : "text-dusk"}>{met ? "Done" : "Not yet"}</span>
                   </li>
                 );
               })}
@@ -89,7 +89,7 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
           )}
         </Row>
         <Row label="Output">{task.output || "None stated"}</Row>
-        <Row label="Notes"><span className="whitespace-pre-line text-stone">{task.notes || "None"}</span></Row>
+        <Row label="Notes"><span className="whitespace-pre-line text-mist">{task.notes || "None"}</span></Row>
       </dl>
 
       <section aria-labelledby="brief">
@@ -97,12 +97,12 @@ export default async function TaskPage({ params }: { params: Promise<{ project: 
           <h2 id="brief" className="text-xl">Start a new session</h2>
           <CopyButton text={brief} />
         </div>
-        <p className="mb-3 max-w-2xl text-sm text-stone">
+        <p className="mb-3 max-w-2xl text-sm text-mist">
           Open a fresh session{loaded.project.sessionsUrl ? (
-            <> at <a className="text-bronze-hi underline-offset-4 hover:underline" href={loaded.project.sessionsUrl} target="_blank" rel="noopener noreferrer">{loaded.project.sessionsUrl.replace("https://", "")}</a></>
+            <> at <a className="text-violet-hi underline-offset-4 hover:underline" href={loaded.project.sessionsUrl} target="_blank" rel="noopener noreferrer">{loaded.project.sessionsUrl.replace("https://", "")}</a></>
           ) : null}, name it exactly as shown above, and paste this brief as the first message.
         </p>
-        <pre className="panel overflow-x-auto whitespace-pre-wrap break-words p-4 text-xs leading-relaxed text-stone">{brief}</pre>
+        <pre className="panel overflow-x-auto whitespace-pre-wrap break-words p-4 text-xs leading-relaxed text-mist">{brief}</pre>
       </section>
     </div>
   );
