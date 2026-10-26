@@ -1,0 +1,30 @@
+{
+  "projects": [
+    {
+      "id": "mygold",
+      "name": "MyGold",
+      "sessionsUrl": "https://claude.ai/code",
+      "source": { "type": "github", "repo": "lastkdj/Mygold", "branch": "dev", "fallbackDir": "fixtures/mygold" },
+      "files": {
+        "board": "docs/agents/board.md",
+        "approvals": "docs/agents/approvals.md",
+        "usage": "docs/agents/token-usage.md"
+      },
+      "sessionName": "{task} · {slug} · {stage}",
+      "branchPattern": "agent/{role}/{task}-{slug}",
+      "rulesPath": "docs/agents/RULES.md"
+    },
+    {
+      "id": "sample",
+      "name": "Sample: Tidewatch",
+      "source": { "type": "fixtures", "dir": "fixtures/sample" },
+      "files": {
+        "board": "agents/tasks.md",
+        "approvals": "agents/gates.md",
+        "usage": "agents/costs.md"
+      },
+      "sessionName": "[{task}] {slug} / {stage}",
+      "branchPattern": "work/{task}-{slug}"
+    }
+  ]
+}
